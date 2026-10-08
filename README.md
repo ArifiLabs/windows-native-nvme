@@ -59,6 +59,19 @@ under `HKLM\SYSTEM\CurrentControlSet\Control\StorPort`. If the check passes, the
 We found this by reading `storport.sys` on build 29680: the value name and the code that reads it. Nothing in the
 Settings app or any other Windows binary writes it on this build.
 
+## Requirements
+
+| What | Why | Notes |
+|---|---|---|
+| Windows 11 build with the storport switch | the switch lives in storport | tested on Insider Dev builds 29680 and 29683; other builds untested |
+| Administrator rights + PowerShell 7 (`winget install Microsoft.PowerShell`) | the scripts write a device registry value | run `pwsh` as administrator |
+| An NVMe **data** drive | first test never on the boot drive | the switch is per controller |
+| A backup and a working recovery environment (WinRE) | the undo path if Windows does not start | `reagentc /info` must show WinRE Enabled |
+| DiskSpd (optional) | before/after numbers | `winget install Microsoft.DiskSpd` |
+| smartmontools (optional) | drive health on the native stack | Windows' own reliability counters are empty under `nvmedisk.sys`; `smartctl -a` still reads them (`winget install smartmontools.smartmontools`) |
+
+Secure Boot and driver signing stay on; no driver or system file is installed or changed.
+
 ## Do it yourself
 
 **Before you start:** back up. Test on a **data** drive, never your boot drive first. This is undocumented and
