@@ -6,7 +6,7 @@ rem Test on running Windows (changes nothing):  winre-undo.cmd test
 setlocal EnableDelayedExpansion
 if /i "%~1"=="test" (set "ROOT=HKLM\SYSTEM" & goto :select)
 set WIN=
-for %%L in (C D E F G H I J K) do if exist %%L:\Windows\System32\config\SYSTEM set WIN=%%L:
+for %%L in (C D E F G H I J K) do if not defined WIN if exist %%L:\Windows\System32\config\SYSTEM set WIN=%%L:
 if "%WIN%"=="" (echo Windows folder not found on any drive & exit /b 1)
 echo Windows found on %WIN%
 reg load HKLM\OFF %WIN%\Windows\System32\config\SYSTEM || (echo reg load failed & exit /b 1)

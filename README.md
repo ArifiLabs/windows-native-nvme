@@ -41,6 +41,9 @@ That CPU goes back to whatever is consuming the data; for us, a local LLM stream
 
 Raw numbers: [`results/diskspd-summary.csv`](results/diskspd-summary.csv). The S880 stock run is one round taken
 while other jobs ran; every other arm is the mean of two rounds on a quiet machine.
+[`results/diskspd-native-full.csv`](results/diskspd-native-full.csv) is a separate run of all nine `bench.ps1` tests
+(adds sequential, 128 KB and write tests) on the native stack, two rounds each. Its CPU column moves a lot between
+rounds, so the tables above do not use it.
 
 ## How it works
 
@@ -84,19 +87,19 @@ may change in any Windows build.
    `C:\winre-undo.cmd`). It is your way back if Windows ever fails to start.
 3. In an elevated PowerShell 7, list your controllers:
    ```
-   pwsh -File enable-native-nvme.ps1 -List
+   pwsh -File scripts\enable-native-nvme.ps1 -List
    ```
-4. Measure before: `pwsh -File bench.ps1 -Target <a big file on that drive> -Out .\before`
+4. Measure before: `pwsh -File scripts\bench.ps1 -Target <a big file on that drive> -Out .\before`. It reads that file and, unless you add `-NoWrites`, also writes and deletes a 16 GB scratch file on the same drive.
 5. Enable it on one controller, using its `VEN_xxxx&DEV_xxxx` from the list:
    ```
-   pwsh -File enable-native-nvme.ps1 -Match 'VEN_1E4B&DEV_1602'
+   pwsh -File scripts\enable-native-nvme.ps1 -Match 'VEN_1E4B&DEV_1602'
    ```
    The script refuses if the boot or system disk sits behind that controller.
-6. Reboot, then check: `pwsh -File enable-native-nvme.ps1 -Status`. Success looks like
+6. Reboot, then check: `pwsh -File scripts\enable-native-nvme.ps1 -Status`. Success looks like
    `class=NvmeDisk driver=nvmedisk` for that drive.
-7. Measure after: `pwsh -File bench.ps1 -Target <same file> -Out .\after`
+7. Measure after: `pwsh -File scripts\bench.ps1 -Target <same file> -Out .\after`
 
-**Undo:** `pwsh -File enable-native-nvme.ps1 -Undo -Match '<same VEN&DEV>'`, then reboot. If Windows does not
+**Undo:** `pwsh -File scripts\enable-native-nvme.ps1 -Undo -Match '<same VEN&DEV>'`, then reboot. If Windows does not
 start: Troubleshoot > Advanced options > Command Prompt, run `C:\winre-undo.cmd` (try `D:\`, `E:\` if the letter
 moved), then Continue.
 
@@ -129,8 +132,8 @@ to it. It is written so the assistant follows the same safe order a person would
 ```text
 Goal: switch ONE data NVMe drive on this Windows 11 PC to the native NVMe stack (nvmedisk.sys) using the scripts in
 this folder, with a working way back. Rules:
-1. Read README.md and both scripts in full before running anything. Run everything in an elevated PowerShell 7.
-2. Run `winre-undo.cmd test` on the running system and show me its output. Then copy winre-undo.cmd to the root of
+1. Read README.md and all three scripts in scripts\ in full before running anything. Run everything in an elevated PowerShell 7.
+2. Run `scripts\winre-undo.cmd test` on the running system and show me its output. Then copy winre-undo.cmd to the root of
    the Windows drive (C:\winre-undo.cmd). Do not continue until that file exists.
 3. Ask me to confirm a recent backup and a restore point (Checkpoint-Computer) before any change.
 4. Run `enable-native-nvme.ps1 -List`. Pick a controller whose disks are NOT marked [BOOT/SYSTEM]. Never pass
@@ -161,10 +164,10 @@ Boot or driver signing.
 
 ## Notes
 
-- Tested only on Windows 11 Insider build 29680, three consumer drives without on-board DRAM: the two data drives
+- Tested only on Windows 11 Insider builds 29680 and 29683, with Microsoft's stock NVMe controller driver (`stornvme.sys`), three consumer drives without on-board DRAM: the two data drives
   above, then the boot drive (Crucial P3 Plus, with `-AllowBootDisk`, after both data drives had worked through a
   reboot). Your results may differ.
-- The switch is per controller: every namespace behind that controller goes native.
+- The switch is per controller: every namespace behind that controller goes native. Drives on a vendor NVMe driver or behind Intel RST / VMD were not tested.
 - Windows updates can change storport. After an update, run `-Status` again. The native stack survived the update
   from 29680 to 29683 on all three drives (2026-10-08); that update did turn SysMain and Windows Search back on.
 
