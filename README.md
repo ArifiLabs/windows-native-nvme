@@ -1,4 +1,6 @@
-# Native NVMe on Windows 11 client: a per-drive switch, no patched files
+# Native NVMe on Windows 11: skip the SCSI layer, one drive at a time
+
+![native.nvme for Windows 11: the native path skips disk.sys and the SCSI layer](media/native-nvme-banner.webp)
 
 Windows Server 2025 introduced a native NVMe storage stack (`nvmedisk.sys`): the disk talks NVMe directly,
 without the old SCSI path (the SCSI disk driver `disk.sys` and the SCSI-to-NVMe translation in `stornvme.sys`; `stornvme.sys` still drives the controller). On Windows 11 client builds there is no
