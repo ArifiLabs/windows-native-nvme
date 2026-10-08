@@ -1,7 +1,7 @@
 # Native NVMe on Windows 11 client: a per-drive switch, no patched files
 
 Windows Server 2025 introduced a native NVMe storage stack (`nvmedisk.sys`): the disk talks NVMe directly,
-without the old SCSI translation layer (`stornvme.sys` + `disk.sys`). On Windows 11 client builds there is no
+without the old SCSI path (the SCSI disk driver `disk.sys` and the SCSI-to-NVMe translation in `stornvme.sys`; `stornvme.sys` still drives the controller). On Windows 11 client builds there is no
 supported switch for it.
 
 **We found one built into Windows itself.** Storport reads a per-controller registry value at boot. Set it on a
