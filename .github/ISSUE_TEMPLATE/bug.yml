@@ -1,0 +1,39 @@
+name: Problem or result report
+description: The switch did not work, a drive failed to come up, or your numbers differ from ours.
+title: "Report: "
+labels: ["report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **PC does not boot after the switch?** Open Troubleshoot > Advanced options > Command Prompt and run `C:\winre-undo.cmd` first (see "Do it yourself" in the README), then report here.
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version and build
+      description: Press Win+R, type winver, and copy the line (for example 25H2, build 26200.1234).
+    validations:
+      required: true
+  - type: input
+    id: drive
+    attributes:
+      label: Drive model and controller
+      description: For example Fanxiang S880 1 TB (Silicon Motion SM2268XT). Say if it is the boot drive.
+    validations:
+      required: true
+  - type: input
+    id: pc
+    attributes:
+      label: PC or motherboard model
+  - type: textarea
+    id: what
+    attributes:
+      label: What you did and what happened
+      description: The script or step you ran, and the result. Paste any error text.
+    validations:
+      required: true
+  - type: textarea
+    id: numbers
+    attributes:
+      label: Before and after numbers (optional)
+      description: Paste the bench.ps1 CSV rows if you ran it.

@@ -1,0 +1,11 @@
+name: Idea or feedback
+description: Suggest an improvement to the guide or the scripts.
+title: "Idea: "
+labels: ["feedback"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea or feedback
+    validations:
+      required: true
